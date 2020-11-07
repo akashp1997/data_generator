@@ -1,15 +1,14 @@
 import hashlib
 import argparse
 import multiprocessing
-import numpy
+from numpy import random
 import os
 from time import perf_counter, sleep
-
 
 def generate_data(process_no, file_size, **kwargs):
     print(os.path.join(kwargs['path'], f'blr_data_{process_no}.raw'))
     with open(os.path.join(kwargs['path'], f'blr_data_{process_no}.raw'), 'wb') as out_file:
-        random_state = numpy.random.RandomState(kwargs['seed'])
+        random_state = random.RandomState(kwargs['seed'])
         process_write_speed = kwargs['write_speed'] / kwargs['num_writers']
         while file_size > 0:
             num_megabytes = min(process_write_speed, file_size)
@@ -24,6 +23,7 @@ def generate_data(process_no, file_size, **kwargs):
 
 
 if __name__ == '__main__':
+    multiprocessing.freeze_support()
     argument_parser = argparse.ArgumentParser()
     argument_parser.add_argument('--produce', action='store_true')
     argument_parser.add_argument('--verify', action='store_true')
@@ -60,11 +60,11 @@ if __name__ == '__main__':
         partial_file_size = (args['data_size'] * 1024) % args['max_file_size']
 
         # Generate full file SHA256
-        random_state = numpy.random.RandomState(args['seed'])
+        random_state = random.RandomState(args['seed'])
         full_size_sha256 = hashlib.sha256(random_state.bytes(args['max_file_size'] * 1024 * 1024)).hexdigest()
 
         # Generate last file's SHA256
-        random_state = numpy.random.RandomState(args['seed'])
+        random_state = random.RandomState(args['seed'])
         partial_sha256 = hashlib.sha256(random_state.bytes(partial_file_size * 1024 * 1024)).hexdigest()
 
         # Verify hash for all but last file
