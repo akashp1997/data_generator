@@ -5,6 +5,7 @@ from numpy import random
 import os
 from time import perf_counter, sleep
 
+
 def generate_data(process_no, file_size, **kwargs):
     print(os.path.join(kwargs['path'], f'blr_data_{process_no}.raw'))
     with open(os.path.join(kwargs['path'], f'blr_data_{process_no}.raw'), 'wb') as out_file:
@@ -71,12 +72,14 @@ if __name__ == '__main__':
         for index in range(num_full_size_files):
             print(f'blr_data_{index}.raw')
             sha256 = hashlib.sha256(open(os.path.join(args['path'], f'blr_data_{index}.raw'), 'rb').read()).hexdigest()
-            assert sha256 == full_size_sha256
+            assert sha256 == full_size_sha256, f'SHA256 for file [blr_data_{index}.raw]' \
+                                               f' does not match [{full_size_sha256}]'
 
         if os.path.exists(os.path.join(args['path'], f'blr_data_{num_full_size_files}.raw')):
             sha256 = hashlib.sha256(
                 open(os.path.join(args['path'], f'blr_data_{num_full_size_files}.raw'), 'rb').read()).hexdigest()
-            assert sha256 == partial_sha256
+            assert sha256 == partial_sha256, f'SHA256 for file [blr_data_{num_full_size_files}.raw]' \
+                                             f' does not match [{partial_sha256}]'
         print('All files\' checksum has been verified')
     time_elapsed = perf_counter() - start_time
     print(f"Time elapsed: {time_elapsed}")
